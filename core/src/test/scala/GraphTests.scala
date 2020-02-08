@@ -173,8 +173,18 @@ object GraphTests extends Properties("Graph") {
   // TODO Clean these up, probably into a GraphCogen class. Keep the questionable ones hidden.
   implicit def cogenMap[K: Cogen: Ordering, V: Cogen]: Cogen[Map[K, V]] =
     Cogen.it(_.toVector.sortBy(_._1).iterator)
+
+  implicit def cogenGrContext[V: Cogen: Ordering, A:Cogen, B:Cogen: Ordering]: Cogen[GrContext[V, A, B]] =
+    Cogen[(Map[V, Set[B]], A, Map[V, Set[B]])].contramap(c => (c.inAdj, c.label, c.outAdj))
+
   implicit def cogenContext[V: Cogen: Ordering, A: Cogen, B: Cogen: Ordering]: Cogen[Context[V, A, B]] =
     Cogen[(V, GrContext[V, A, B])].contramap(c => c.vertex -> c.toGrContext)
+
+  implicit def cogenGDecomp[V: Cogen: Ordering, A:Cogen, B:Cogen: Ordering]: Cogen[GDecomp[V, A, B]] =
+    Cogen[(Context[V, A, B], Graph[V, A, B])].contramap(d => (d.ctx, d.rest))
+
+  implicit def cogenGraph[V: Cogen: Ordering, A:Cogen, B:Cogen: Ordering]: Cogen[Graph[V, A, B]] =
+    Cogen[Map[V, GrContext[V, A, B]]].contramap(_.rep)
 
   include(ComonadTests[({type λ[α] = GDecomp[N,α,Int]})#λ].comonad[Int, Int, Int].all)
 
