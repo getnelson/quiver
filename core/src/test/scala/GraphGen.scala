@@ -39,7 +39,6 @@ object GraphGen {
 
   def genExistingEdge[B: Arbitrary, N, A](nodes: List[LNode[N,A]]): Gen[LEdge[N,B]] = for {
     label <- arbitrary[B]
-    if nodes.nonEmpty
     a <- Gen.oneOf(nodes)
     b <- Gen.oneOf(nodes)
   } yield LEdge(a.vertex, b.vertex, label)

@@ -1,20 +1,17 @@
-import com.typesafe.sbt.SbtSite.SiteKeys._
-import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
-import sbtunidoc.Plugin.UnidocKeys._
-
+enablePlugins(TutPlugin)
+enablePlugins(ScalaUnidocPlugin)
+enablePlugins(GhpagesPlugin)
 enablePlugins(DisablePublishingPlugin)
 
-site.settings
+// for whatever reason addMappingsToSiteDir insists on a setting key and not a value
+val tutSiteDir = settingKey[String]("site directory for tut file mappings (defaults to empty string for top-level)")
+tutSiteDir := ""
+val unidocSiteDir = settingKey[String]("site directory for unidoc")
+unidocSiteDir := "api"
 
-tutSettings
+addMappingsToSiteDir(tut, tutSiteDir)
 
-site.addMappingsToSiteDir(tut, "")
-
-unidocSettings
-
-site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api")
-
-ghpages.settings
+addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), unidocSiteDir)
 
 ghpagesNoJekyll := false
 
@@ -22,10 +19,9 @@ includeFilter in makeSite := "*.yml" | "*.md" | "*.html" | "*.css" | "*.png" | "
 
 git.remoteRepo := "git@github.com:oncue/quiver.git"
 
-scalacOptions in (ScalaUnidoc, sbtunidoc.Plugin.UnidocKeys.unidoc) ++= Seq(
+scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
   "-doc-source-url", "https://github.com/oncue/quiver/blob/master€{FILE_PATH}.scala",
   "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,
   "-groups",
-  "-implicits",
-  "-skip-packages", "scalaz"
+  "-implicits"
 )

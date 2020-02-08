@@ -138,7 +138,7 @@ object GraphTests extends Properties("Graph") {
     }
 
   property("The roots of a graph have no incoming edges from other nodes") = forAll {
-    (ns: List[LNode[N,Int]], es: List[LEdge[N,Int]], i: Int) =>
+    (ns: List[LNode[N,Int]], es: List[LEdge[N,Int]]) =>
       val g = safeMkGraph(ns, es)
       val vs = ns.map(_.vertex).toSet
       val roots = vs.filterNot(n => es.find { e =>
@@ -148,7 +148,7 @@ object GraphTests extends Properties("Graph") {
     }
 
   property("The leaves of a graph have no outgoing edges to other nodes") = forAll {
-    (ns: List[LNode[N,Int]], es: List[LEdge[N,Int]], i: Int) =>
+    (ns: List[LNode[N,Int]], es: List[LEdge[N,Int]]) =>
       val g = safeMkGraph(ns, es)
       val vs = ns.map(_.vertex).toSet
       val leaves = vs.filterNot(n => es.find { e =>
@@ -163,7 +163,7 @@ object GraphTests extends Properties("Graph") {
       val from = tpg._2.vertex
       val to = tpg._3.vertex
       val sPath = graph.lesp(from, to)
-      val cPath = graph.cheapestPath[Int](from, to, (f: LNode[N,Int], l: Int, t: LNode[N,Int]) => 1)
+      val cPath = graph.cheapestPath[Int](from, to, (_: LNode[N,Int], _: Int, _: LNode[N,Int]) => 1)
       s"Paths different: cheapest = $cPath, shortest = $sPath" |: sPath === cPath
     }
 
