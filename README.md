@@ -1,6 +1,6 @@
 # Quiver
 
-![image](docs/src/site/img/logo.png)
+![image](docs/logo.png)
 
 [![Join the chat at https://gitter.im/verizon/quiver](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/verizon/quiver)
 [![Build Status](https://travis-ci.org/Verizon/quiver.svg?branch=master)](https://travis-ci.org/Verizon/quiver)
