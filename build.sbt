@@ -7,11 +7,12 @@ lazy val quiver = project
     skip in publish := true
   )
 
-val CatsVersion         = "2.2.0"
-val SilencerVersion     = "1.7.1"
+val CatsVersion         = "2.6.1"
 val ScalacheckShapeless = "1.2.5"
-val CollectionsCompat   = "2.2.0"
+val CollectionsCompat   = "2.5.0"
 val ScodecVersion       = "1.11.7"
+val Scala212Version     = "2.12.14"
+val Scala213Version     = "2.13.6"
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
@@ -25,26 +26,19 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     )
   )
   .settings(commonSettings)
-  .settings(silenceCompat)
+  .settings(silenceUnusedImport)
   .settings(coverageEnabled := scalaBinaryVersion.value != "2.13")
   .jsSettings(coverageEnabled := false)
 
-val commonSettings = Seq(
-  organization in Global := "io.getnelson.quiver",
-  scalaVersion in Global := crossScalaVersions.value.head,
-  crossScalaVersions in Global := Seq("2.13.3", "2.12.12"),
+val silenceUnusedImport = Seq(
+  scalacOptions += "-Wconf:cat=unused-imports&site=quiver:s,any:wv",
+  scalacOptions += "-Wconf:cat=unused-imports:s,any:wv"
 )
 
-val silenceCompat = Seq(
-  libraryDependencies ++= Seq(
-    compilerPlugin(
-      "com.github.ghik" % "silencer-plugin" % SilencerVersion cross CrossVersion.full
-    ),
-    "com.github.ghik" % "silencer-lib" % SilencerVersion % Provided cross CrossVersion.full
-  ),
-  scalacOptions in Compile ++= Seq(
-    """-P:silencer:lineContentFilters=import scala\.collection\.compat\._"""
-  )
+val commonSettings = Seq(
+  organization := "io.getnelson.quiver",
+  scalaVersion := Scala212Version,
+  crossScalaVersions := Seq(Scala212Version, Scala213Version)
 )
 
 lazy val codecs = crossProject(JSPlatform, JVMPlatform)
@@ -65,6 +59,7 @@ lazy val docs = project
   .in(file("quiver-docs"))
   .dependsOn(core.jvm, codecs.jvm)
   .enablePlugins(MdocPlugin, MicrositesPlugin, ScalaUnidocPlugin)
+  .settings(commonSettings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(
       core.jvm,
@@ -87,4 +82,3 @@ lazy val docs = project
     micrositeDocumentationLabelDescription := "API Documentation",
     micrositeBaseUrl := "/quiver"
   )
-  .settings(silenceCompat)

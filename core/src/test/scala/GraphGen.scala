@@ -62,7 +62,7 @@ object GraphGen {
   } yield g.decomp(n).toGDecomp.get
 
   implicit def arbitraryGDecomp[A: Arbitrary, B: Arbitrary, N: Arbitrary]: Arbitrary[GDecomp[N, A, B]] = Arbitrary(genGDecomp[N,A,B])
-  implicit def arbitraryGDecompF[A: Arbitrary, B: Arbitrary, N: Arbitrary]: Arbitrary[GDecomp[N, A, B] => A] = Arbitrary(Gen.const(_.label))
+  implicit def arbitraryGDecompF[A, B, N]: Arbitrary[GDecomp[N, A, B] => A] = Arbitrary(Gen.const(_.label))
 
   def genTwoPointedGraph[N: Arbitrary, A: Arbitrary, B: Arbitrary]: Gen[(Graph[N,A,B], LNode[N,A], LNode[N,A])] = for {
     vs <- Gen.listOf(genNode[N,A])

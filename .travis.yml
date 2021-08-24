@@ -20,7 +20,7 @@ script:
   - |
     if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
       if [ $RELEASE_ON_PUSH = 'false' ]; then
-        sbt test coverageReport
+        sbt +test coverageReport
       else
         sbt ++$TRAVIS_SCALA_VERSION 'release with-defaults'
       fi
