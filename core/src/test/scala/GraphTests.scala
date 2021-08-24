@@ -68,8 +68,8 @@ object GraphTests extends Properties("Graph") {
 
   property("A graph constructed from nodes and edges should contain those nodes and edges") =
     forAll { (ns: List[N], es: List[LEdge[N,Int]], i: Int) =>
-      implicit val NO = Order[LNode[N,Int]].toOrdering
-      implicit val EO = Order[LEdge[N,Int]].toOrdering
+      implicit val NO: Ordering[LNode[N, Int]] = Order[LNode[N,Int]].toOrdering
+      implicit val EO: Ordering[LEdge[N, Int]] = Order[LEdge[N,Int]].toOrdering
       val nns = ns.toSet.toList.map((b: N) => LNode(b, i)).sorted
       val ees = es.toSet.toList.filter((x: LEdge[N,Int]) =>
                   ns.contains(x.from) && ns.contains(x.to)
@@ -125,7 +125,7 @@ object GraphTests extends Properties("Graph") {
     forAll { (g1: Graph[N,Int,Int], g2: Graph[N,Int,Int]) =>
       val u1 = g1 union g2
       val u2 = g2 union g1
-      implicit val N = Order[Edge[N]].toOrdering
+      implicit val N: Ordering[Edge[N]] = Order[Edge[N]].toOrdering
       u1.edges.sorted == u2.edges.sorted && u1.nodes.sorted == u2.nodes.sorted
     }
 
@@ -168,7 +168,6 @@ object GraphTests extends Properties("Graph") {
     }
 
   import GDecomp._
-  import org.scalacheck.ScalacheckShapeless._
 
   // TODO Clean these up, probably into a GraphCogen class. Keep the questionable ones hidden.
   implicit def cogenMap[K: Cogen: Ordering, V: Cogen]: Cogen[Map[K, V]] =

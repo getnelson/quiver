@@ -20,15 +20,16 @@ import org.scalacheck._
 import org.scalacheck.Prop._
 import scodec.codecs
 import scodec.Attempt
+import scodec.Codec
 
 object GraphCodecsTest extends Properties("codecs"){
   import GraphGen.{arbitraryNode,arbitraryEdge,arbitraryGraph}
 
-  implicit val uint8 = codecs.int32
+  implicit val uint8: Codec[Int] = codecs.int32
 
   def roundTrip[A](typeName: String)(implicit ca: scodec.Codec[A], aa: Arbitrary[A]): Unit = {
     val _ = property(s"binary encoding round trip - $typeName") = {
-      forAll { a: A =>
+      forAll { (a: A) =>
         val result = for {
           encoded <- ca.encode(a)
           decoded <- ca.decode(encoded)

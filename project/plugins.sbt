@@ -6,7 +6,7 @@ resolvers += Resolver.url(
 addSbtPlugin("io.verizon.build"          % "sbt-rig"                  % "5.0.39"   excludeAll(
     ExclusionRule(organization = "org.scoverage")
 ))
-addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat"             % "0.1.10")
+addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat"             % "0.1.20")
 addSbtPlugin("com.eed3si9n"              % "sbt-unidoc"               % "0.4.3")
 addSbtPlugin("org.scalameta"             % "sbt-mdoc"                 % "2.2.22")
 addSbtPlugin("org.portable-scala"        % "sbt-scalajs-crossproject" % "1.0.0")
