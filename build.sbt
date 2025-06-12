@@ -37,7 +37,12 @@ val silenceUnusedImport = Seq(
 val commonSettings = Seq(
   organization := "io.getnelson.quiver",
   scalaVersion := Scala212Version,
-  crossScalaVersions := Seq(Scala212Version, Scala213Version, Scala3Version)
+  crossScalaVersions := Seq(Scala212Version, Scala213Version, Scala3Version),
+  publishTo := {
+    val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+    if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+    else localStaging.value
+  }
 )
 
 lazy val codecs = crossProject(JSPlatform, JVMPlatform)
