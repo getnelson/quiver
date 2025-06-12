@@ -4,7 +4,7 @@ lazy val quiver = project
   .in(file("."))
   .aggregate(core.jvm, core.js, codecs.jvm, codecs.js, docs)
   .settings(
-    skip in publish := true
+    publish / skip := true
   )
 
 val CatsVersion         = "2.6.1"
@@ -82,13 +82,13 @@ lazy val docs = project
   .settings(commonSettings)
   .settings(
     crossScalaVersions -= Scala3Version,
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(
+    ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(
       core.jvm,
       codecs.jvm
     ),
     docsMappingsAPIDir := "api",
     addMappingsToSiteDir(
-      mappings in (ScalaUnidoc, packageDoc),
+      ScalaUnidoc / packageDoc / mappings,
       docsMappingsAPIDir
     ),
     mdocVariables := {
@@ -96,7 +96,7 @@ lazy val docs = project
         version.value.replaceFirst("[\\+\\-].*", "")
       Map("VERSION" -> stableVersion)
     },
-    mdocIn := (baseDirectory in ThisBuild).value / "docs" / "mdoc",
+    mdocIn := (ThisBuild / baseDirectory).value / "docs" / "mdoc",
     micrositeName := "Quiver - a Scala graph library",
     micrositeUrl := "https://getnelson.github.io",
     micrositeDocumentationUrl := "/quiver/api/index.html",
