@@ -9,12 +9,12 @@ lazy val quiver = project
 
 val CatsVersion         = "2.6.1"
 val ScalacheckShapeless = "1.2.5"
-val CollectionsCompat   = "2.5.0"
+val CollectionsCompat   = "2.13.0"
 val ScodecVersion       = "1.11.7"
 val Scodec2Version      = "2.0.0"
-val Scala212Version     = "2.12.14"
-val Scala213Version     = "2.13.6"
-val Scala3Version       = "3.0.1"
+val Scala212Version     = "2.12.20"
+val Scala213Version     = "2.13.16"
+val Scala3Version       = "3.3.6"
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
@@ -28,18 +28,10 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   )
   .settings(commonSettings)
   .settings(silenceUnusedImport)
-  .settings(coverageEnabled := scalaBinaryVersion.value == "2.13")
-  .jsSettings(coverageEnabled := false)
+  .settings(coverageEnabled := false)
 
 val silenceUnusedImport = Seq(
-  scalacOptions ++= {
-    if (scalaBinaryVersion.value.startsWith("2."))
-      Seq(
-        "-Wconf:cat=unused-imports&site=quiver:s,any:wv",
-        "-Wconf:cat=unused-imports:s,any:wv"
-      )
-    else Seq.empty
-  }
+  Compile / scalacOptions += "-Wconf:origin=scala.collection.compat._:s"
 )
 
 val commonSettings = Seq(
@@ -69,8 +61,7 @@ lazy val codecs = crossProject(JSPlatform, JVMPlatform)
     }
   )
   .settings(commonSettings)
-  .settings(coverageEnabled := scalaBinaryVersion.value == "2.13")
-  .jsSettings(coverageEnabled := false)
+  .settings(coverageEnabled := false)
 
 lazy val docsMappingsAPIDir = settingKey[String](
   "Name of subdirectory in site target directory for api docs"
