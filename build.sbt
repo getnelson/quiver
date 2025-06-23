@@ -1,3 +1,6 @@
+import laika.ast.Path.Root
+import laika.helium.Helium
+import laika.helium.config._
 import java.net.URL
 
 ThisBuild / organization := "io.getnelson.quiver"
@@ -67,34 +70,7 @@ lazy val codecs = crossProject(JSPlatform, JVMPlatform)
   )
   .settings(coverageEnabled := false)
 
-lazy val docsMappingsAPIDir = settingKey[String](
-  "Name of subdirectory in site target directory for api docs"
-)
 lazy val docs = project
-  .in(file("quiver-docs"))
-  .dependsOn(core.jvm, codecs.jvm)
-  .enablePlugins(MdocPlugin, MicrositesPlugin, ScalaUnidocPlugin)
-  .settings(
-    crossScalaVersions := (ThisBuild / crossScalaVersions).value
-      .filterNot(_ == Scala3Version),
-    ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(
-      core.jvm,
-      codecs.jvm
-    ),
-    docsMappingsAPIDir := "api",
-    addMappingsToSiteDir(
-      ScalaUnidoc / packageDoc / mappings,
-      docsMappingsAPIDir
-    ),
-    mdocVariables := {
-      val stableVersion: String =
-        version.value.replaceFirst("[\\+\\-].*", "")
-      Map("VERSION" -> stableVersion)
-    },
-    mdocIn := (ThisBuild / baseDirectory).value / "docs" / "mdoc",
-    micrositeName := "Quiver - a Scala graph library",
-    micrositeUrl := "https://getnelson.github.io",
-    micrositeDocumentationUrl := "/quiver/api/index.html",
-    micrositeDocumentationLabelDescription := "API Documentation",
-    micrositeBaseUrl := "/quiver"
-  )
+  .in(file("site"))
+  .enablePlugins(TypelevelSitePlugin)
+  .dependsOn(core.jvm)
