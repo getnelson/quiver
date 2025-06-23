@@ -1,20 +1,35 @@
+import laika.ast.Path.Root
+import laika.helium.Helium
+import laika.helium.config._
 import java.net.URL
+
+ThisBuild / organization := "io.getnelson.quiver"
+ThisBuild / organizationName := "Nelson Team"
+ThisBuild / scalaVersion := Scala212Version
+ThisBuild / crossScalaVersions := Seq(
+  Scala212Version,
+  Scala213Version,
+  Scala3Version
+)
+ThisBuild / tlBaseVersion := "8.0"
+// Pending a bot account or API key to add to GitHub
+ThisBuild / githubWorkflowPublishTargetBranches := Nil
 
 lazy val quiver = project
   .in(file("."))
   .aggregate(core.jvm, core.js, codecs.jvm, codecs.js, docs)
   .settings(
-    skip in publish := true
+    publish / skip := true
   )
 
 val CatsVersion         = "2.6.1"
 val ScalacheckShapeless = "1.2.5"
-val CollectionsCompat   = "2.5.0"
+val CollectionsCompat   = "2.13.0"
 val ScodecVersion       = "1.11.7"
 val Scodec2Version      = "2.0.0"
-val Scala212Version     = "2.12.14"
-val Scala213Version     = "2.13.6"
-val Scala3Version       = "3.0.1"
+val Scala212Version     = "2.12.20"
+val Scala213Version     = "2.13.16"
+val Scala3Version       = "3.3.6"
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
@@ -26,26 +41,11 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
       "org.typelevel"          %%% "cats-laws"               % CatsVersion % Test
     )
   )
-  .settings(commonSettings)
   .settings(silenceUnusedImport)
-  .settings(coverageEnabled := scalaBinaryVersion.value == "2.13")
-  .jsSettings(coverageEnabled := false)
+  .settings(coverageEnabled := false)
 
 val silenceUnusedImport = Seq(
-  scalacOptions ++= {
-    if (scalaBinaryVersion.value.startsWith("2."))
-      Seq(
-        "-Wconf:cat=unused-imports&site=quiver:s,any:wv",
-        "-Wconf:cat=unused-imports:s,any:wv"
-      )
-    else Seq.empty
-  }
-)
-
-val commonSettings = Seq(
-  organization := "io.getnelson.quiver",
-  scalaVersion := Scala212Version,
-  crossScalaVersions := Seq(Scala212Version, Scala213Version, Scala3Version)
+  Compile / scalacOptions += "-Wconf:origin=scala.collection.compat._:s"
 )
 
 lazy val codecs = crossProject(JSPlatform, JVMPlatform)
@@ -68,38 +68,9 @@ lazy val codecs = crossProject(JSPlatform, JVMPlatform)
       else Seq.empty
     }
   )
-  .settings(commonSettings)
-  .settings(coverageEnabled := scalaBinaryVersion.value == "2.13")
-  .jsSettings(coverageEnabled := false)
+  .settings(coverageEnabled := false)
 
-lazy val docsMappingsAPIDir = settingKey[String](
-  "Name of subdirectory in site target directory for api docs"
-)
 lazy val docs = project
-  .in(file("quiver-docs"))
-  .dependsOn(core.jvm, codecs.jvm)
-  .enablePlugins(MdocPlugin, MicrositesPlugin, ScalaUnidocPlugin)
-  .settings(commonSettings)
-  .settings(
-    crossScalaVersions -= Scala3Version,
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(
-      core.jvm,
-      codecs.jvm
-    ),
-    docsMappingsAPIDir := "api",
-    addMappingsToSiteDir(
-      mappings in (ScalaUnidoc, packageDoc),
-      docsMappingsAPIDir
-    ),
-    mdocVariables := {
-      val stableVersion: String =
-        version.value.replaceFirst("[\\+\\-].*", "")
-      Map("VERSION" -> stableVersion)
-    },
-    mdocIn := (baseDirectory in ThisBuild).value / "docs" / "mdoc",
-    micrositeName := "Quiver - a Scala graph library",
-    micrositeUrl := "https://getnelson.github.io",
-    micrositeDocumentationUrl := "/quiver/api/index.html",
-    micrositeDocumentationLabelDescription := "API Documentation",
-    micrositeBaseUrl := "/quiver"
-  )
+  .in(file("site"))
+  .enablePlugins(TypelevelSitePlugin)
+  .dependsOn(core.jvm)
