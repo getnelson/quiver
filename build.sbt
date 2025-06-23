@@ -1,5 +1,17 @@
 import java.net.URL
 
+ThisBuild / organization := "io.getnelson.quiver"
+ThisBuild / organizationName := "Nelson Team"
+ThisBuild / scalaVersion := Scala212Version
+ThisBuild / crossScalaVersions := Seq(
+  Scala212Version,
+  Scala213Version,
+  Scala3Version
+)
+ThisBuild / tlBaseVersion := "8.0"
+// Pending a bot account or API key to add to GitHub
+ThisBuild / githubWorkflowPublishTargetBranches := Nil
+
 lazy val quiver = project
   .in(file("."))
   .aggregate(core.jvm, core.js, codecs.jvm, codecs.js, docs)
@@ -26,23 +38,11 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
       "org.typelevel"          %%% "cats-laws"               % CatsVersion % Test
     )
   )
-  .settings(commonSettings)
   .settings(silenceUnusedImport)
   .settings(coverageEnabled := false)
 
 val silenceUnusedImport = Seq(
   Compile / scalacOptions += "-Wconf:origin=scala.collection.compat._:s"
-)
-
-val commonSettings = Seq(
-  organization := "io.getnelson.quiver",
-  scalaVersion := Scala212Version,
-  crossScalaVersions := Seq(Scala212Version, Scala213Version, Scala3Version),
-  publishTo := {
-    val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
-    if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
-    else localStaging.value
-  }
 )
 
 lazy val codecs = crossProject(JSPlatform, JVMPlatform)
@@ -65,7 +65,6 @@ lazy val codecs = crossProject(JSPlatform, JVMPlatform)
       else Seq.empty
     }
   )
-  .settings(commonSettings)
   .settings(coverageEnabled := false)
 
 lazy val docsMappingsAPIDir = settingKey[String](
@@ -75,9 +74,9 @@ lazy val docs = project
   .in(file("quiver-docs"))
   .dependsOn(core.jvm, codecs.jvm)
   .enablePlugins(MdocPlugin, MicrositesPlugin, ScalaUnidocPlugin)
-  .settings(commonSettings)
   .settings(
-    crossScalaVersions -= Scala3Version,
+    crossScalaVersions := (ThisBuild / crossScalaVersions).value
+      .filterNot(_ == Scala3Version),
     ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(
       core.jvm,
       codecs.jvm
