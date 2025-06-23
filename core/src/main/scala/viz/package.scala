@@ -44,9 +44,9 @@ package object viz {
   ): String = {
     def sn(node: LNode[N, A]) =
       node match {
-        case LNode(n, a) =>
+        case LNode(vertex, a) =>
           val sa = sl(a)
-          if (sa == "") "" else s"\t$n$sa\n"
+          if (sa == "") "" else s"\t$vertex$sa\n"
       }
     def se(edge: LEdge[N, B]) =
       edge match {
