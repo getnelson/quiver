@@ -36,8 +36,7 @@ package quiver
 import cats.Monoid
 import cats.implicits._
 
-import scala.collection.compat._
-
+import scala.annotation.nowarn
 import scala.collection.compat.immutable.LazyList
 
 case class Edge[N](from: N, to: N)
@@ -98,7 +97,9 @@ case class LNode[N, A](vertex: N, label: A) {
   * @groupdesc classification Classification functions on graphs
   * @groupprio classification 100
   */
+@nowarn("msg=[Uu]nused import")
 case class Graph[N, A, B](rep: GraphRep[N, A, B]) {
+  import scala.collection.compat._
 
   /**
     * Check if the graph is empty
