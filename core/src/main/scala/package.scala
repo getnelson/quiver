@@ -34,8 +34,8 @@
 import cats.{Monoid, Order}
 import cats.free.Cofree
 import cats.implicits._
+import scala.annotation.nowarn
 import scala.collection.compat.immutable.LazyList
-import scala.collection.compat._
 
 /**
   * @groupname creation Graph Construction
@@ -174,12 +174,16 @@ package object quiver {
     * Create a graph that is a cycle of the given nodes
     * @group creation
     */
-  def cycle[N](vs: Seq[N]): Graph[N, Unit, Unit] =
+  @nowarn("msg=[Uu]nused import")
+  def cycle[N](vs: Seq[N]): Graph[N, Unit, Unit] = {
+    import scala.collection.compat._
+
     mkGraph(
       vs.map(LNode(_, ())),
       if (vs.isEmpty) Seq()
       else vs.lazyZip(vs.tail ++ Seq(vs.head)).map(LEdge[N, Unit](_, _, ()))
     )
+  }
 
   /**
     * Create a directed star graph of degree `n`

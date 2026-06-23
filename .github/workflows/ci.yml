@@ -30,11 +30,12 @@ jobs:
         os: [ubuntu-22.04]
         scala: [2.12, 2.13, 3]
         java: [temurin@8]
+        project: [quiverJS, quiverJVM, quiverNative]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -44,7 +45,7 @@ jobs:
       - name: Setup Java (temurin@8)
         id: setup-java-temurin-8
         if: matrix.java == 'temurin@8'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 8
@@ -59,18 +60,26 @@ jobs:
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
-        run: sbt '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
+
+      - name: scalaJSLink
+        if: matrix.project == 'quiverJS'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' Test/scalaJSLinkerResult
+
+      - name: nativeLink
+        if: matrix.project == 'quiverNative'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' Test/nativeLink
 
       - name: Test
-        run: sbt '++ ${{ matrix.scala }}' test
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
-        run: sbt '++ ${{ matrix.scala }}' mimaReportBinaryIssues
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
-        run: sbt '++ ${{ matrix.scala }}' doc
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
 
   dependency-submission:
     name: Submit Dependencies
@@ -82,7 +91,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -92,7 +101,7 @@ jobs:
       - name: Setup Java (temurin@8)
         id: setup-java-temurin-8
         if: matrix.java == 'temurin@8'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 8
@@ -105,7 +114,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: docs_2.12 docs_2.13 docs_3
+          modules-ignore: quiverjs_2.12 quiverjs_2.13 quiverjs_3 docs_2.12 docs_2.13 docs_3 quiverjvm_2.12 quiverjvm_2.13 quiverjvm_3 quivernative_2.12 quivernative_2.13 quivernative_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   site:
@@ -117,7 +126,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -127,7 +136,7 @@ jobs:
       - name: Setup Java (temurin@8)
         id: setup-java-temurin-8
         if: matrix.java == 'temurin@8'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 8
@@ -140,7 +149,7 @@ jobs:
       - name: Setup Java (temurin@11)
         id: setup-java-temurin-11
         if: matrix.java == 'temurin@11'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 11
