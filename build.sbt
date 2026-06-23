@@ -6,9 +6,11 @@ ThisBuild / crossScalaVersions := Seq(
   Scala213Version,
   Scala3Version
 )
-ThisBuild / tlBaseVersion := "9.0"
+ThisBuild / tlBaseVersion := "8.1"
 // Pending a bot account or API key to add to GitHub
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
+// Different tagging scheme was used under previous management
+ThisBuild / tlMimaPreviousVersions += "8.0.9"
 
 lazy val quiver = tlCrossRootProject
   .aggregate(core, codecs, docs)
@@ -31,6 +33,19 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
       "org.typelevel"          %%% "cats-laws"               % CatsVersion % Test
     )
   )
+  .jvmSettings(
+    tlVersionIntroduced := Map("3" -> "8.1.0")
+  )
+  .jsSettings(
+    tlVersionIntroduced := Map("3" -> "8.1.0")
+  )
+  .nativeSettings(
+    tlVersionIntroduced := Map(
+      "2.12" -> "8.1.0",
+      "2.13" -> "8.1.0",
+      "3"    -> "8.1.0"
+    )
+  )
 
 lazy val codecs = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -42,6 +57,19 @@ lazy val codecs = crossProject(JSPlatform, JVMPlatform, NativePlatform)
         "org.scodec"    %%% "scodec-core" % ScodecVersion
       else "org.scodec" %%% "scodec-core" % Scodec2Version
     }
+  )
+  .jvmSettings(
+    tlVersionIntroduced := Map("3" -> "8.1.0")
+  )
+  .jsSettings(
+    tlVersionIntroduced := Map("3" -> "8.1.0")
+  )
+  .nativeSettings(
+    tlVersionIntroduced := Map(
+      "2.12" -> "8.1.0",
+      "2.13" -> "8.1.0",
+      "3"    -> "8.1.0"
+    )
   )
 
 lazy val docs = project
